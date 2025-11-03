@@ -19,9 +19,7 @@ def get_timestamped_filename(detection: Detection) -> str:
     return f"{timestamp}_{rounded_confidence}.jpg"
 
 
-def get_date_path(
-    detection: Detection, timespec: Literal["seconds", "milliseconds"]
-) -> str:
+def get_date_path(detection: Detection, timespec: Literal["seconds", "milliseconds"]) -> str:
     return detection.date.isoformat(timespec=timespec).replace(":", "-")
 
 
@@ -46,6 +44,8 @@ class Config:
     detectors: list[DetectorConfig]
     telegram_bot_token: str | None = None
     telegram_chat_id: str | None = None
+    webhook_url: str | None = None
+    webhook_token: str | None = None
 
 
 config_json = json.load(open("config.json"))

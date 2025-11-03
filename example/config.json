@@ -1,6 +1,8 @@
 {
     "telegram_bot_token": "<your_bot_token>",
     "telegram_chat_id": "<your_chat_id>",
+    "webhook_url" : "http://<localipaddress>:<port>/api/webhook/<webhookname>",
+    "webhook_token": "<your webhook token>",
     "detectors": [
         {
             "collection": {
