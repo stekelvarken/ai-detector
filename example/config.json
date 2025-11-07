@@ -1,17 +1,23 @@
 {
-    "telegram_bot_token": "<your_bot_token>",
-    "telegram_chat_id": "<your_chat_id>",
     "detectors": [
         {
             "collection": {
-                "time_seconds": 5,
+                "time_seconds": 50,
                 "frames_min": 3,
-                "confidence_threshold": 0.84
+                "min_confidence": 0.7
             },
             "model_url": "https://github.com/CowCatcherAI/CowCatcherAI/releases/download/modelv-14/cowcatcherV14.pt",
-            "save_directory": "mounts",
-            "sources": ["sprong24.mp4"],
-            "telegram_chat_id": "<your_chat_id>"
+            "sources": ["example/sprong24.mp4"],
+            "exporters": {
+                "telegram": {
+                    "token": "<your_bot_token>",
+                    "chat": "<your_chat_id>",
+                    "min_confidence": 0.84
+                },
+                "disk": {
+                    "directory": "mounts"
+                }
+            }
         }
     ]
 }

@@ -19,9 +19,7 @@ def get_timestamped_filename(detection: Detection) -> str:
     return f"{timestamp}_{rounded_confidence}.jpg"
 
 
-def get_date_path(
-    detection: Detection, timespec: Literal["seconds", "milliseconds"]
-) -> str:
+def get_date_path(detection: Detection, timespec: Literal["seconds", "milliseconds"]) -> str:
     return detection.date.isoformat(timespec=timespec).replace(":", "-")
 
 
@@ -29,7 +27,26 @@ def get_date_path(
 class CollectionConfig:
     time_seconds: int
     frames_min: int
-    confidence_threshold: float
+    min_confidence: float
+
+
+@dataclass
+class ChatConfig:
+    token: str
+    chat: str
+    min_confidence: float | None = None
+
+
+@dataclass
+class DiskConfig:
+    directory: Path
+    min_confidence: float | None = None
+
+
+@dataclass
+class ExportersConfig:
+    disk: DiskConfig | list[DiskConfig] | None = None
+    telegram: ChatConfig | list[ChatConfig] | None = None
 
 
 @dataclass
@@ -37,15 +54,12 @@ class DetectorConfig:
     collection: CollectionConfig
     model_url: str
     sources: list[str]
-    save_directory: Path | None = None
-    telegram_chat_id: str | None = None
+    exporters: ExportersConfig | None = None
 
 
 @dataclass
 class Config:
     detectors: list[DetectorConfig]
-    telegram_bot_token: str | None = None
-    telegram_chat_id: str | None = None
 
 
 config_json = json.load(open("config.json"))
