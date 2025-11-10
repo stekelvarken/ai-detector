@@ -27,20 +27,20 @@ def get_date_path(detection: Detection, timespec: Literal["seconds", "millisecon
 class CollectionConfig:
     time_seconds: int
     frames_min: int
-    min_confidence: float
+    confidence: float
 
 
 @dataclass
 class ChatConfig:
     token: str
     chat: str
-    min_confidence: float | None = None
+    confidence: float | None = None
 
 
 @dataclass
 class DiskConfig:
     directory: Path
-    min_confidence: float | None = None
+    confidence: float | None = None
 
 
 @dataclass
@@ -52,7 +52,7 @@ class ExportersConfig:
 @dataclass
 class DetectorConfig:
     collection: CollectionConfig
-    model_url: str
+    model: str
     sources: list[str]
     exporters: ExportersConfig | None = None
 

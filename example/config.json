@@ -4,15 +4,15 @@
             "collection": {
                 "time_seconds": 50,
                 "frames_min": 3,
-                "min_confidence": 0.7
+                "confidence": 0.7
             },
-            "model_url": "https://github.com/CowCatcherAI/CowCatcherAI/releases/download/modelv-14/cowcatcherV14.pt",
+            "model": "https://github.com/CowCatcherAI/CowCatcherAI/releases/download/modelv-14/cowcatcherV15.pt",
             "sources": ["example/sprong24.mp4"],
             "exporters": {
                 "telegram": {
                     "token": "<your_bot_token>",
                     "chat": "<your_chat_id>",
-                    "min_confidence": 0.84
+                    "confidence": 0.84
                 },
                 "disk": {
                     "directory": "mounts"

@@ -56,13 +56,13 @@ class Detector:
             for disk_exporter in disk_list:
                 exporters.append(DiskExporter.from_config(config, detector, disk_exporter))
 
-        return cls(detector.model_url, detector.sources, detector.collection, exporters)
+        return cls(detector.model, detector.sources, detector.collection, exporters)
 
     def start(self):
         def runner():
             results = self.model.predict(
                 source=self.source,
-                conf=self.config.min_confidence,
+                conf=self.config.confidence,
                 stream=True,
             )
             for result in results:

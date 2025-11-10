@@ -10,8 +10,8 @@ class TelegramExporter(Exporter):
     base_url: str
     chat: str
 
-    def __init__(self, token: str, chat: str, min_confidence: float):
-        super().__init__(min_confidence, token, chat)
+    def __init__(self, token: str, chat: str, confidence: float):
+        super().__init__(confidence, token, chat)
         self.base_url = f"https://api.telegram.org/bot{token}"
         self.chat = chat
 
@@ -20,7 +20,7 @@ class TelegramExporter(Exporter):
         return cls(
             exporter.token,
             exporter.chat,
-            min_confidence=exporter.min_confidence or detector.collection.min_confidence,
+            confidence=exporter.confidence or detector.collection.confidence,
         )
 
     def filtered_export(self, detections: list[Detection]):
