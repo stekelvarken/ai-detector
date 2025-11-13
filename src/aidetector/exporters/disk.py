@@ -23,7 +23,7 @@ class DiskExporter(Exporter):
 
     @classmethod
     def from_config(cls, config: Config, detector: DetectorConfig, exporter: DiskConfig) -> Self:
-        return cls(exporter.directory, exporter.confidence or detector.collection.confidence)
+        return cls(exporter.directory, exporter.confidence or detector.detection.confidence)
 
     def filtered_export(self, sorted_detections: list[Detection]):
         self.logger.info(f"Saving {len(sorted_detections)} photos to disk")

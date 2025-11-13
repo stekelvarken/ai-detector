@@ -9,7 +9,7 @@ from ultralytics import YOLO
 from ultralytics.data.utils import IMG_FORMATS, VID_FORMATS
 from ultralytics.engine.results import Results
 
-from aidetector.config import ChatConfig, CollectionConfig, Config, Detection, DetectorConfig, DiskConfig
+from aidetector.config import ChatConfig, Config, Detection, DetectionConfig, DetectorConfig, DiskConfig
 from aidetector.exporters.disk import DiskExporter
 from aidetector.exporters.exporter import Exporter
 from aidetector.exporters.telegram import TelegramExporter
@@ -23,7 +23,7 @@ class Detector:
         self,
         model: str,
         sources: list[str],
-        config: CollectionConfig,
+        config: DetectionConfig,
         exporters: list[Exporter],
     ):
         self.config = config
@@ -56,7 +56,7 @@ class Detector:
             for disk_exporter in disk_list:
                 exporters.append(DiskExporter.from_config(config, detector, disk_exporter))
 
-        return cls(detector.model, detector.sources, detector.collection, exporters)
+        return cls(detector.model, detector.sources, detector.detection, exporters)
 
     def start(self):
         def runner():
@@ -74,7 +74,7 @@ class Detector:
 
     def _filter_detections(self):
         self.detections = [
-            d for d in self.detections if (datetime.now() - d.date).total_seconds() <= self.config.time_seconds
+            d for d in self.detections if (datetime.now() - d.date).total_seconds() <= self.config.time_max
         ]
 
     def _add_detection(self, result: Results):
@@ -88,11 +88,13 @@ class Detector:
 
     def _try_export(self):
         now: datetime = datetime.now()
-        if not self.detections:
+        if not self.detections or len(self.detections) < self.config.frames_min:
             return
 
         time_collecting = (now - self.detections[0].date).total_seconds()
-        if len(self.detections) < self.config.frames_min or time_collecting < self.config.time_seconds:
+        timeout = (now - self.detections[-1].date).total_seconds()
+
+        if (time_collecting < self.config.time_max) and (timeout < self.config.timeout):
             return
 
         self.logger.info(

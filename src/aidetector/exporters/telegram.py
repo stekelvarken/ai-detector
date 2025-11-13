@@ -20,7 +20,7 @@ class TelegramExporter(Exporter):
         return cls(
             exporter.token,
             exporter.chat,
-            confidence=exporter.confidence or detector.collection.confidence,
+            confidence=exporter.confidence or detector.detection.confidence,
         )
 
     def filtered_export(self, detections: list[Detection]):

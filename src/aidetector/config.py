@@ -24,10 +24,11 @@ def get_date_path(detection: Detection, timespec: Literal["seconds", "millisecon
 
 
 @dataclass
-class CollectionConfig:
-    time_seconds: int
-    frames_min: int
+class DetectionConfig:
     confidence: float
+    time_max: int = 60
+    timeout: int = 0
+    frames_min: int = 1
 
 
 @dataclass
@@ -51,7 +52,7 @@ class ExportersConfig:
 
 @dataclass
 class DetectorConfig:
-    collection: CollectionConfig
+    detection: DetectionConfig
     model: str
     sources: list[str]
     exporters: ExportersConfig | None = None
