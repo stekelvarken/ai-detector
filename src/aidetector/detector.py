@@ -9,11 +9,10 @@ from ultralytics import YOLO
 from ultralytics.data.utils import IMG_FORMATS, VID_FORMATS
 from ultralytics.engine.results import Results
 
-from aidetector.config import CollectionConfig, Config, Detection, DetectorConfig
+from aidetector.config import ChatConfig, Config, Detection, DetectionConfig, DetectorConfig, DiskConfig
 from aidetector.exporters.disk import DiskExporter
 from aidetector.exporters.exporter import Exporter
 from aidetector.exporters.telegram import TelegramExporter
-from aidetector.exporters.webhook import WebhookExporter
 
 
 class Detector:
@@ -24,7 +23,7 @@ class Detector:
         self,
         model: str,
         sources: list[str],
-        config: CollectionConfig,
+        config: DetectionConfig,
         exporters: list[Exporter],
     ):
         self.config = config
@@ -40,21 +39,30 @@ class Detector:
             f.write("\n".join(sources))
 
     @classmethod
-    def fromConfig(cls, config: Config, detector: DetectorConfig) -> Self:
-        exporterTypes: list[type[Self]] = [TelegramExporter, DiskExporter, WebhookExporter]
-        exporters = list(
-            filter(
-                None,
-                [exporter.fromConfig(config, detector) for exporter in exporterTypes],
-            )
-        )
-        return cls(detector.model_url, detector.sources, detector.collection, exporters)
+    def from_config(cls, config: Config, detector: DetectorConfig) -> Self:
+        exporters: list[Exporter] = []
+        if detector.exporters is not None:
+            telegram_obj: list[ChatConfig] | ChatConfig = detector.exporters.telegram or []
+            telegram_list: list[ChatConfig] = [
+                x for x in (telegram_obj if isinstance(telegram_obj, list) else [telegram_obj]) if x is not None
+            ]
+            for telegram_exporter in telegram_list:
+                exporters.append(TelegramExporter.from_config(config, detector, telegram_exporter))
+
+            disk_obj: list[DiskConfig] | DiskConfig = detector.exporters.disk or []
+            disk_list: list[DiskConfig] = [
+                x for x in (disk_obj if isinstance(disk_obj, list) else [disk_obj]) if x is not None
+            ]
+            for disk_exporter in disk_list:
+                exporters.append(DiskExporter.from_config(config, detector, disk_exporter))
+
+        return cls(detector.model, detector.sources, detector.detection, exporters)
 
     def start(self):
         def runner():
             results = self.model.predict(
                 source=self.source,
-                conf=self.config.confidence_threshold,
+                conf=self.config.confidence,
                 stream=True,
             )
             for result in results:
@@ -66,7 +74,7 @@ class Detector:
 
     def _filter_detections(self):
         self.detections = [
-            d for d in self.detections if (datetime.now() - d.date).total_seconds() <= self.config.time_seconds
+            d for d in self.detections if (datetime.now() - d.date).total_seconds() <= self.config.time_max
         ]
 
     def _add_detection(self, result: Results):
@@ -80,11 +88,13 @@ class Detector:
 
     def _try_export(self):
         now: datetime = datetime.now()
-        if not self.detections:
+        if not self.detections or len(self.detections) < self.config.frames_min:
             return
 
         time_collecting = (now - self.detections[0].date).total_seconds()
-        if len(self.detections) < self.config.frames_min or time_collecting < self.config.time_seconds:
+        timeout = (now - self.detections[-1].date).total_seconds()
+
+        if (time_collecting < self.config.time_max) and (timeout < self.config.timeout):
             return
 
         self.logger.info(

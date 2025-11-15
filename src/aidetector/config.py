@@ -24,19 +24,38 @@ def get_date_path(detection: Detection, timespec: Literal["seconds", "millisecon
 
 
 @dataclass
-class CollectionConfig:
-    time_seconds: int
-    frames_min: int
-    confidence_threshold: float
+class DetectionConfig:
+    confidence: float
+    time_max: int = 60
+    timeout: int = 0
+    frames_min: int = 1
+
+
+@dataclass
+class ChatConfig:
+    token: str
+    chat: str
+    confidence: float | None = None
+
+
+@dataclass
+class DiskConfig:
+    directory: Path
+    confidence: float | None = None
+
+
+@dataclass
+class ExportersConfig:
+    disk: DiskConfig | list[DiskConfig] | None = None
+    telegram: ChatConfig | list[ChatConfig] | None = None
 
 
 @dataclass
 class DetectorConfig:
-    collection: CollectionConfig
-    model_url: str
+    detection: DetectionConfig
+    model: str
     sources: list[str]
-    save_directory: Path | None = None
-    telegram_chat_id: str | None = None
+    exporters: ExportersConfig | None = None
 
 
 @dataclass
