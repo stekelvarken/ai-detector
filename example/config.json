@@ -1,8 +1,4 @@
 {
-    "telegram_bot_token": "<your_bot_token>",
-    "telegram_chat_id": "<your_chat_id>",
-    "webhook_url" : "http://<localipaddress>:<port>/api/webhook/<webhookname>",
-    "webhook_token": "<your webhook token>",
     "detectors": [
         {
             "detection": {
@@ -14,9 +10,9 @@
             "model": "https://github.com/CowCatcherAI/CowCatcherAI/releases/download/modelv-14/cowcatcherV15.pt",
             "sources": ["example/sprong24.mp4"],
             "exporters": {
-                "telegram": {
-                    "token": "<your_bot_token>",
-                    "chat": "<your_chat_id>",
+                "webhook": {
+                   "webhook_url" : "http://192.168.9.3:8123/api/webhook/cowcatcher2",
+                    "webhook_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIxMzAxYWVlNTM2MWE0MjJkOGIxNWQ1OTYzMGY4MDg0NSIsImlhdCI6MTc2MjEwMTg5NywiZXhwIjoyMDc3NDYxODk3fQ.CKBdZ2q1bRVgIzZ55EnBXPZYv3CA5Eorzuq6-2VA-WE",
                     "confidence": 0.84
                 },
                 "disk": {

@@ -9,10 +9,11 @@ from ultralytics import YOLO
 from ultralytics.data.utils import IMG_FORMATS, VID_FORMATS
 from ultralytics.engine.results import Results
 
-from aidetector.config import ChatConfig, Config, Detection, DetectionConfig, DetectorConfig, DiskConfig
+from aidetector.config import ChatConfig, Config, Detection, DetectionConfig, DetectorConfig, DiskConfig, WebhookConfig
 from aidetector.exporters.disk import DiskExporter
 from aidetector.exporters.exporter import Exporter
 from aidetector.exporters.telegram import TelegramExporter
+from aidetector.exporters.webhook import WebhookExporter
 
 
 class Detector:
@@ -55,6 +56,14 @@ class Detector:
             ]
             for disk_exporter in disk_list:
                 exporters.append(DiskExporter.from_config(config, detector, disk_exporter))
+            # todo: add webhook exporter
+
+            webhook_obj: list[WebhookConfig] | WebhookConfig = detector.exporters.webhook or []
+            webhook_list: list[WebhookConfig] = [
+                x for x in (webhook_obj if isinstance(webhook_obj, list) else [webhook_obj]) if x is not None
+            ]
+            for webhook_exporter in webhook_list:
+                exporters.append(WebhookExporter.from_config(config, detector, webhook_exporter))
 
         return cls(detector.model, detector.sources, detector.detection, exporters)
 

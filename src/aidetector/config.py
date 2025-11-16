@@ -39,6 +39,13 @@ class ChatConfig:
 
 
 @dataclass
+class WebhookConfig:
+    webhook_url: str
+    webhook_token: str
+    confidence: float | None = None
+
+
+@dataclass
 class DiskConfig:
     directory: Path
     confidence: float | None = None
@@ -48,6 +55,7 @@ class DiskConfig:
 class ExportersConfig:
     disk: DiskConfig | list[DiskConfig] | None = None
     telegram: ChatConfig | list[ChatConfig] | None = None
+    webhook: WebhookConfig | list[WebhookConfig] | None = None
 
 
 @dataclass
@@ -61,10 +69,6 @@ class DetectorConfig:
 @dataclass
 class Config:
     detectors: list[DetectorConfig]
-    telegram_bot_token: str | None = None
-    telegram_chat_id: str | None = None
-    webhook_url: str | None = None
-    webhook_token: str | None = None
 
 
 config_json = json.load(open("config.json"))

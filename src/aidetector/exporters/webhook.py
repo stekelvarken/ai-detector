@@ -9,6 +9,7 @@ from aidetector.config import (
     Config,
     Detection,
     DetectorConfig,
+    WebhookConfig,
     get_date_path,
     get_timestamped_filename,
 )
@@ -18,20 +19,30 @@ from aidetector.exporters.exporter import Exporter
 class WebhookExporter(Exporter):
     webhook_url: str
     webhook_token: str
+    confidence: float
 
-    def __init__(self, webhook_url: str, webhook_token: str):
-        super().__init__(webhook_url, webhook_token)
+    def __init__(self, webhook_url: str, webhook_token: str, confidence: float):
+        super().__init__(confidence, webhook_url, webhook_token)
         self.webhook_url: str = webhook_url
         self.webhook_token: str = webhook_token
+        self.confidence: float = confidence
 
     @classmethod
-    def fromConfig(cls, config: Config, detector: DetectorConfig) -> Self | None:
-        # If one of the config items of wehook is empty return none
-        if config.webhook_url is None or config.webhook_token is None:
-            return None
-        return cls(config.webhook_url, config.webhook_token)
+    def from_config(cls, config: Config, detector: DetectorConfig, exporter: WebhookConfig) -> Self:
+        return cls(
+            exporter.webhook_url,
+            exporter.webhook_token,
+            confidence=exporter.confidence or detector.detection.confidence,
+        )
 
-    def export(self, sorted_detections: list[Detection]):
+    # @classmethod
+    # def fromConfig(cls, config: Config, detector: DetectorConfig) -> Self | None:
+    #     # If one of the config items of wehook is empty return none
+    #     if config.webhook_url is None or config.webhook_token is None:
+    #         return None
+    #     return cls(config.webhook_url, config.webhook_token)
+
+    def filtered_export(self, sorted_detections: list[Detection]):
         if not sorted_detections:
             return
         try:
